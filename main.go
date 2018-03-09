@@ -32,6 +32,10 @@ func main() {
 		switch ev := msg.Data.(type) {
 		case *slack.MessageEvent:
 			fmt.Printf("Message: %v\n", ev)
+			_, _, err := api.PostMessage("C048MG6B6", ev.Text, slack.PostMessageParameters{})
+			if err != nil {
+				log.Fatal("Error %s", err.Error())
+			}
 		}
 	}
 }
