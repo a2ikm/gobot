@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -25,16 +24,25 @@ func main() {
 		api.SetDebug(true)
 	}
 
+	resp, err := api.GetBotInfo("")
+	if err != nil {
+		log.Fatalf("Error GetUserIdentity %s", err.Error())
+		os.Exit(1)
+	}
+	botID := resp.ID
+
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
 
 	for msg := range rtm.IncomingEvents {
 		switch ev := msg.Data.(type) {
 		case *slack.MessageEvent:
-			fmt.Printf("Message: %v\n", ev)
+			if ev.User == botID {
+				continue
+			}
 			_, _, err := api.PostMessage("C048MG6B6", ev.Text, slack.PostMessageParameters{})
 			if err != nil {
-				log.Fatal("Error %s", err.Error())
+				log.Fatalf("Error %s", err.Error())
 			}
 		}
 	}
